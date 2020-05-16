@@ -1,13 +1,10 @@
 // Copyright 2018 Your Name <your_email>
 
 #include <header.hpp>
-
 boost::asio::io_service service;
-boost::asio::ip::tcp::endpoint ep(
- boost::asio::ip::address::from_string("127.0.0.1"), 8001);
 
 struct talk_to_svr {
-    talk_to_svr(std::string  username)
+    explicit talk_to_svr(std::string  username)
             : sock_(service), username_(std::move(username))
     {}
 
@@ -40,6 +37,7 @@ private:
 
     void process_msg() {
         std::string msg(buff_, already_read_);
+
         if ( msg.find("login ") == 0) on_login();
         else if ( msg.find("ping") == 0) on_ping(msg);
         else if ( msg.find("clients ") == 0) on_clients(msg);
@@ -88,6 +86,8 @@ private:
 };
 
 void run_client(const std::string & client_name) {
+    boost::asio::ip::tcp::endpoint ep(
+            boost::asio::ip::address::from_string("127.0.0.1"), 8001);
     talk_to_svr client(client_name);
     try {
         client.connect(ep);
@@ -98,7 +98,7 @@ void run_client(const std::string & client_name) {
     }
 }
 
-int main(int argc, char* argv[]) {
+int main() {
     run_client("Aleksey");
 }
 
